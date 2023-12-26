@@ -1,19 +1,26 @@
-import { Body, Controller, Post, Request, UseGuards } from '@nestjs/common';
+import { Body, Controller, Post, Request } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { LoginAuthDto, RegisterAuthDto } from './dto';
+import { ResponseFormatter } from 'src/helpers';
 
 @Controller('auth')
 export class AuthController {
-  constructor(private authServicer: AuthService) {}
+  constructor(
+    private authServicer: AuthService,
+    private responseFormater: ResponseFormatter,
+  ) {}
 
   @Post('signup')
-  signup(@Body() body: RegisterAuthDto) {
-    return this.authServicer.register(body);
+  async signup(@Body() body: RegisterAuthDto) {
+    const data = await this.authServicer.register(body);
+
+    return this.responseFormater.success(data, 'Registrasi Berhasil');
   }
 
   @Post('login')
-  login(@Body() body: LoginAuthDto) {
-    return this.authServicer.login(body);
+  async login(@Body() body: LoginAuthDto) {
+    const login = await this.authServicer.login(body);
+    return this.responseFormater.success(login, 'Login Berhasil');
   }
 
   @Post('logout')

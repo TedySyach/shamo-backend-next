@@ -17,22 +17,31 @@ import { UserService } from './user.service';
 import { diskStorage } from 'multer';
 import { multerProfileConfig } from 'src/config';
 import { UpdateUserDto } from './dto';
+import { ResponseFormatter } from 'src/helpers';
 
 @Controller('users')
 export class UserController {
-  constructor(private userService: UserService) {}
+  constructor(
+    private userService: UserService,
+    private responseFormater: ResponseFormatter,
+  ) {}
 
   @Get()
   @UseGuards(UserGuards)
   getUser(@GetUser('') user: User) {
-    return user;
+    const data = user;
+
+    return this.responseFormater.success(data, 'Berhasil Mengambil data user');
   }
 
   @Put()
   @UseGuards(UserGuards)
   async updateUserInfo(@GetUser() user: User, @Body() body: UpdateUserDto) {
     const userData = await this.userService.updateUserInfo(user.id, body);
-    return userData;
+    return this.responseFormater.success(
+      userData,
+      'Berhasil Mengupdate info user',
+    );
   }
 
   @Post('upload-profile-pict')
@@ -43,13 +52,16 @@ export class UserController {
     @GetUser() user: User,
   ) {
     const data = await this.userService.uploadProfilePicture(user.id, file);
-    return data;
+    return this.responseFormater.success(data, 'Berhasil Memasang Profile');
   }
 
   @Put('delete-profile-pict')
   @UseGuards(UserGuards)
   async deleteProfilePic(@GetUser() user: User) {
     const data = await this.userService.deleteProfilePicture(user.id);
-    return data;
+    return this.responseFormater.success(
+      data,
+      'Berhasil Menghapus Foto Profile',
+    );
   }
 }

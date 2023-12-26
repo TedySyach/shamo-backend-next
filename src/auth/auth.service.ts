@@ -40,6 +40,8 @@ export class AuthService {
     try {
       // hasing password
       const hash = await argon.hash(body.password);
+
+      const role = body.role || 'USER';
       // save new user
       const user = await this.prisma.user.create({
         data: {
@@ -48,6 +50,7 @@ export class AuthService {
           email: body.email,
           phone: body.phone,
           password: hash,
+          role: 'ADMIN',
         },
       });
 

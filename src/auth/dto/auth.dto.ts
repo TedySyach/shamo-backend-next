@@ -20,6 +20,8 @@ export class RegisterAuthDto {
   @IsString()
   @IsNotEmpty()
   password: string;
+
+  role: string;
 }
 
 export class LoginAuthDto {
