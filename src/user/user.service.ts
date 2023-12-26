@@ -1,10 +1,26 @@
 import { BadRequestException, Injectable } from '@nestjs/common';
 import { PrismaService } from 'src/prisma/prisma.service';
 import * as fs from 'fs';
+import { UpdateUserDto } from './dto';
 
 @Injectable()
 export class UserService {
   constructor(private prismaService: PrismaService) {}
+
+  async updateUserInfo(userId: number, body: UpdateUserDto) {
+    const user = await this.prismaService.user.update({
+      where: { id: userId },
+      data: {
+        name: body.name,
+        phone: body.phone,
+        address: body.address,
+      },
+    });
+
+    delete user.password;
+
+    return user;
+  }
 
   async uploadProfilePicture(userId: number, file: Express.Multer.File) {
     try {
