@@ -19,6 +19,7 @@ model User {
   password          String
   role              String              @default("USER")
   profilePict       String?
+  address           String?
   transaction       Transaction[]
   transactionDetail TransactionDetail[]
 
