@@ -1,0 +1,92 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id                Int                 @id @default(autoincrement())
+  name              String
+  username          String              @unique
+  email             String              @unique
+  phone             String              @unique
+  password          String
+  role              String              @default("USER")
+  profilePict       String?
+  transaction       Transaction[]
+  transactionDetail TransactionDetail[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model ProductCategories {
+  id      Int       @id @default(autoincrement())
+  name    String
+  product Product[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Product {
+  id                Int                 @id @default(autoincrement())
+  name              String
+  price             Float
+  description       String              @db.Text
+  tags              String
+  categorieId       Int
+  productGalery     ProductGalery[]
+  transactionDetail TransactionDetail[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  ProductCategories ProductCategories @relation(fields: [categorieId], references: [id])
+}
+
+model ProductGalery {
+  id        Int    @id @default(autoincrement())
+  url_image String
+  productId Int
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  ProductGalery Product @relation(fields: [productId], references: [id])
+}
+
+model Transaction {
+  id                Int                 @id @default(autoincrement())
+  userId            Int
+  address           String?
+  payment           String              @default("MANUAL")
+  totalPrice        Float               @default(0.0)
+  shipingFee        Float               @default(0.0)
+  status            String              @default("PENDING")
+  transactionDetail TransactionDetail[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  User User @relation(fields: [userId], references: [id])
+}
+
+model TransactionDetail {
+  id            Int      @id @default(autoincrement())
+  userId        Int
+  productId     Int
+  transactionId Int
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  Transaction Transaction @relation(fields: [transactionId], references: [id])
+  User        User        @relation(fields: [userId], references: [id])
+  Product     Product     @relation(fields: [productId], references: [id])
+}
